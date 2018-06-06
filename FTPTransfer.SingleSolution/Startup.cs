@@ -13,6 +13,8 @@ using FTPTransfer.SingleSolution.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace FTPTransfer.SingleSolution
 {
@@ -28,6 +30,22 @@ namespace FTPTransfer.SingleSolution
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var dirPath = Path.Combine(
+                       Directory.GetCurrentDirectory(),
+                       "wwwroot", "Uploads");
+
+
+            DirectoryInfo dir = new DirectoryInfo(dirPath);
+            if (!dir.Exists)
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+
+
+            services.AddSingleton<IFileProvider>(
+                new PhysicalFileProvider(
+                   dirPath));
+
 
             services.Configure<CookiePolicyOptions>(options =>
             {
