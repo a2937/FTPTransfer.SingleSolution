@@ -19,6 +19,8 @@ namespace FTPTransfer.SingleSolution
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseKestrel()
+                .UseDefaultServiceProvider(options => options.ValidateScopes = false);
     }
 }

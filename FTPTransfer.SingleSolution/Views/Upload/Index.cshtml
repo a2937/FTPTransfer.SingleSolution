@@ -1,0 +1,18 @@
+﻿@model FTPTransfer.SingleSolution.Models.Files.FilesViewModel
+
+<p>List of Files</p>
+
+<ul>
+    @foreach (var item in Model.Files)
+    {
+    <li>
+        <a asp-action="Download"
+           asp-route-filename="@item.Name">
+            @item.Name
+        </a>
+        <form asp-action="DeleteFile" asp-route-id="@item.ToString()" method="post">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+    </li>
+    }
+</ul>

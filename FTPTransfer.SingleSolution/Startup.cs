@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using FTPTransfer.SingleSolution.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace FTPTransfer.SingleSolution
 {
@@ -27,6 +28,7 @@ namespace FTPTransfer.SingleSolution
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -37,8 +39,17 @@ namespace FTPTransfer.SingleSolution
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddDefaultIdentity<IdentityUser>(opts =>
+            {
+                opts.User.RequireUniqueEmail = true;
+                opts.Password.RequiredLength = 6;
+                opts.Password.RequireNonAlphanumeric = true;
+                opts.Password.RequireLowercase = true;
+                opts.Password.RequireUppercase = true;
+                opts.Password.RequireDigit = true;
+            }).AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -69,6 +80,9 @@ namespace FTPTransfer.SingleSolution
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            ApplicationDbContext.CreateAdminAccount(app.ApplicationServices,
+     Configuration).Wait();
         }
     }
 }
